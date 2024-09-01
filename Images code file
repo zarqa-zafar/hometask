@@ -1,0 +1,49 @@
+import matplotlib.pyplot as plt
+from skimage import io, color, filters, feature
+from skimage.feature import blob_dog
+from skimage.draw import circle_perimeter
+
+# Load the image
+image = io.imread('animal.jpg')
+
+# Convert the image to grayscale
+gray_image = color.rgb2gray(image)
+
+# Perform edge detection using the Sobel filter
+edges = filters.sobel(gray_image)
+
+# Perform object detection (blob detection using Difference of Gaussian)
+blobs = blob_dog(gray_image, max_sigma=30, threshold=0.1)
+
+# Draw detected blobs (objects) on the original image
+detected_image = image.copy()
+for blob in blobs:
+    y, x, r = blob
+    rr, cc = circle_perimeter(int(y), int(x), int(r), shape=image.shape)
+    detected_image[rr, cc] = (255, 0, 0)  # Red color for the detected circles
+
+# Display the original, grayscale, edge-detected, and object-detected images
+plt.figure(figsize=(12, 8))
+
+# Original Image
+plt.subplot(1, 4, 1)
+plt.title('Original Image')
+plt.imshow(image)
+
+# Grayscale Image
+plt.subplot(1, 4, 2)
+plt.title('Grayscale Image')
+plt.imshow(gray_image, cmap='gray')
+
+# Edge Detection
+plt.subplot(1, 4, 3)
+plt.title('Edge Detection')
+plt.imshow(edges, cmap='gray')
+
+# Object Detection
+plt.subplot(1, 4, 4)
+plt.title('Object Detection')
+plt.imshow(detected_image)
+
+plt.tight_layout()
+plt.show()
